@@ -32,3 +32,12 @@ TODO : explain how to use binwalk to strip the header from the blob
 
 ## Private Key
 The key was not deleted, but 
+
+dpapi::capi /in:"C:\temp\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\566b9cb8d95dc0c0cfe359c9ffeaf252_2c04acab-f7da-4489-b9da-08efb0051201"
+
+dpapi::masterkey /in:"C:\temp\Crypto\Protect\S-1-5-21-809848743-1371230335-2595545360-1001\bb1af8be-89cb-435f-80ed-1379bee29c53" /password:USERPASSWORD
+  sha1: f6d3e18299cc3502af58cbc01e1eea09e1d41972
+
+mimikatz # dpapi::capi /in:"C:\temp\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\566b9cb8d95dc0c0cfe359c9ffeaf252_2c04acab-f7da-4489-b9da-08efb0051201" /masterkey:f6d3e18299cc3502af58cbc01e1eea09e1d41972
+
+ 
