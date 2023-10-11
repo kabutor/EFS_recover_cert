@@ -16,6 +16,9 @@ public class Program
     public static void Main(string[] args)
     {
         byte[] bytes;
+        List<byte> derFile = new List<byte>();
+        List<byte> idFile = new List<byte>();
+
         using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\SystemCertificates\\TrustedPeople\\Certificates\\" + args[0] ))
           {
             if (key != null)
@@ -28,10 +31,32 @@ public class Program
                                 {
                                     bf.Serialize(ms, o);
                                     bytes =  ms.ToArray();
-                                    File.WriteAllBytes(args[0],bytes);
+
+                                    for (int i=0;i < bytes.Length; i++)
+                                        {
+                                            if (bytes[i] == 0x30)
+                                                {
+                                                if (bytes[i+1] == 0x82)
+                                                    {
+                                                    Console.WriteLine("saving DER");
+                                                    for (int j=0; i < bytes.Length; j++)
+                                                        {
+                                                            derFile.Add(bytes[i]);
+                                                            i++;
+                                                        }
+                                                    break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                idFile.Add(bytes[i]);
+                                                }
+                                        }
+                                    
+                                    File.WriteAllBytes(args[0], derFile.ToArray());
                                 }
-                            
-                             // Console.WriteLine( Encoding.Unicode.GetString(bytes[63:80], 0, 10) );
+                               Console.WriteLine(System.Text.Encoding.Unicode.GetString(idFile.ToArray()));
+
                              }
              }
              Console.WriteLine(key);
