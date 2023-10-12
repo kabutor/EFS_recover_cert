@@ -53,7 +53,9 @@ public class Program
                                                 }
                                         }
                                     
-                                    File.WriteAllBytes(args[0], derFile.ToArray());
+                                    // Uncomment this to get the same file as it was on My/Certificates
+                                    // File.WriteAllBytes(args[0] , bytes);
+                                    File.WriteAllBytes(args[0] + ".der", derFile.ToArray());
                                 }
                                Console.WriteLine(System.Text.Encoding.Unicode.GetString(idFile.ToArray()));
 
