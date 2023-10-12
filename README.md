@@ -82,10 +82,10 @@ I just can't believe that something as important as encrypting your files, is no
 
 When I was inspecting the damage, and trying to recover the data, I came with a website that claims that Microsoft have a tool to recover the EFS certificate 
 
-'''     
+```     
     If you have your original profile, you can use "reccerts" tool to retrieve the private key to recovery EFS file.
     reccerts.exe -path: "profile path" -password:<password>
     But you have to contact to Microsoft Support to get this tool. 
-  '''
+```
 
 Thanks for nothing Microsoft.
