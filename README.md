@@ -48,18 +48,18 @@ C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-809848743-1371230
 That is the file with your private key, is encrypted using DPAPI, to decrypt it, again there are several ways to do this, the easy way I think is **disable the antivirus** and use [mimikatz](https://github.com/ParrotSec/mimikatz). 
 I'm not going to go deep in dpapi, you can browse my other repositories about certificates, you have to decrypt the key using mimikatz, for that you need three commands
 
-First, the one that will tell you what masterkey is used to encrypt that password, this command will output a lot of information, the only thig we cared about is the guidMasterKey:
+First, the one that will tell you what masterkey is used to encrypt that password, this command will output a lot of information, the only thing we cared about is the guidMasterKey:
 ```
 dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e"
 guidMasterKey      : {bb1af8be-89cb-435f-80ed-1379bee29c53}
 ```
-Second: Decrypt the masterkey with the user password (the login password, not the pin), this also return a lot of data, important one is the sha1 at the end.
+Second, decrypt the masterkey with the user password (the login password, not the pin), this also return a lot of data, important one is the sha1 at the end.
 ```
 dpapi::masterkey /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Protect\S-1-5-21-809848743-1371230335-2595545360-1001\bb1af8be-89cb-435f-80ed-1379bee29c53" /password:USERPASSWORD
   sha1: f6d3e18299cc3502af58cbc01e1eea09e1d41972
 ```
 
-Third command: decrypt the private key, using the sha1 output as a masterkey parameter, output will be a pvk file with the private key:
+Third command, decrypt the private key, using the sha1 output as a masterkey parameter, output will be a pvk file with the private key:
 ```
 mimikatz # dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e" /masterkey:f6d3e18299cc3502af58cbc01e1eea09e1d41972
 Private export : OK - 'raw_exchange_capi_0_db51e195-d879-4343-8a86-87120652ea65.pvk'
