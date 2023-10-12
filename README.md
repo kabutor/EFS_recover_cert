@@ -64,7 +64,7 @@ Third command, decrypt the private key, using the sha1 output as a masterkey par
 mimikatz # dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e" /masterkey:f6d3e18299cc3502af58cbc01e1eea09e1d41972
 Private export : OK - 'raw_exchange_capi_0_db51e195-d879-4343-8a86-87120652ea65.pvk'
 ```
-## Merge bot parts in a pfx/p12 certificate
+## Merge both files in a pfx/p12 certificate
 Third step, you just have to merge both files into a pfx file you can import that in windows
 ```
 openssl.exe x509 -inform DER -outform PEM -in 0B6E9763170C0C5FBE644162AB4EFED2AE3F171C.der -out public.pem
