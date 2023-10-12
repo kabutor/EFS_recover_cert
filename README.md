@@ -23,21 +23,45 @@ HKEY_CURRENT_USER\SOFTWARE\Microsoft\SystemCertificates\TrustedPeople\Certificat
 
 ![image](https://github.com/kabutor/EFS_recover_cert/assets/43006263/967d8cd3-8858-4c40-90ac-466b9749d649)
 
-To export that blob as a file you can use the reg_blob.exe, you can download it from this repository, (also provided the source code as reg_blob.cs in case you want to compile it) with the fingerprint id as a parameter. You get the same file as you have in the Microsoft\SystemCertificates\My\Certificates\
-'''
-reg_blob.exe 3F0899CD824828B156114C0DF4CC7E21BA5E0C7C
-'''
+To export that blob as a file you can use the reg_blob.exe, you can download it from this repository, (also provided the source code as reg_blob.cs in case you want to compile it) with the fingerprint id as a parameter. 
+Output will be a file with the fingerprint_id.DER, that is your public certificate, also you get some text, and some garbage, the important part is the numbers in the middle.
 
-TODO : explain how to use binwalk to strip the header from the blob
+```
+reg_blob.exe 0B6E9763170C0C5FBE644162AB4EFED2AE3F171C
+saving DER
+A ???   ? ? ? A ? ??????????  I  l          d b 5 1 e 1 9 5 - d 8 7 9 - 4 3 4 3 - 8 a 8 6 - 8 7 1 2 0 6 5 2 e a 6 5     Microsoft Enhanced Cryptographic Provider v1.  ` A ? ??????????" A ??
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\SystemCertificates\TrustedPeople\Certificates\0B6E9763170C0C5FBE644162AB4EFED2AE3F171C
+```
+This is the Key Container of the certificate, there has to be a key on Crypto\RSA\<SID> with that same number (db51e195-d879-4343-8a86-87120652ea65 in the example, in utf-16)
 
 ## Private Key
-The key was not deleted, but 
+The key was not deleted, it is sitting in the %user%\AppData\Roaming\Microsoft\Crypto\RSA\<SID>\ folder, you can do this several ways, I like using grep -H on linux, but in windows the easy way is to type all the files in the console and look at the top numbers, the one that has in the top the same id as the Key Container of the public certificate, that is the file with your Private Key.
 
-dpapi::capi /in:"C:\temp\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\566b9cb8d95dc0c0cfe359c9ffeaf252_2c04acab-f7da-4489-b9da-08efb0051201"
+```
+C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-809848743-1371230335-2595545360-1001> type 7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e
 
-dpapi::masterkey /in:"C:\temp\Crypto\Protect\S-1-5-21-809848743-1371230335-2595545360-1001\bb1af8be-89cb-435f-80ed-1379bee29c53" /password:USERPASSWORD
+☻%∟☺P♠¶ⁿdb51e195-d879-4343-8a86-87120652ea65RSA ☺☺i@╒└Kúÿ~╔Kod¡╦á↨(hM↨²∟ä²É┐ }*┌├u]öB   î▌qoäq╫█£æì⌐0¶▄☼:»─√oQÆ ε»I♀ìΓ.
+0=äpF┘╟:=¬Y║[R╧τZJ╚a▒≡┼4r'EûÅ≡<☼π∞░┤▌ì¿BgR▌í!â▲▄8☼Qfr
+[garbage]
+```
+
+That is the file with your private key, is encrypted using DPAPI, to decrypt it, again there are several ways to do this, the easy way I think is **disable the antivirus** and use [mimikatz](https://github.com/ParrotSec/mimikatz). 
+I'm not going to go deep in dpapi, you can browse my other repositories about certificates, you have to decrypt the key using mimikatz, for that you need three commands
+
+First, the one that will tell you what masterkey is used to encrypt that password, this command will output a lot of information, the only thig we cared about is the guidMasterKey:
+```
+dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e"
+guidMasterKey      : {bb1af8be-89cb-435f-80ed-1379bee29c53}
+```
+Second: Decrypt the masterkey with the user password (the login password, not the pin), this also return a lot of data, important one is the sha1 at the end.
+```
+dpapi::masterkey /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Protect\S-1-5-21-809848743-1371230335-2595545360-1001\bb1af8be-89cb-435f-80ed-1379bee29c53" /password:USERPASSWORD
   sha1: f6d3e18299cc3502af58cbc01e1eea09e1d41972
+```
 
-mimikatz # dpapi::capi /in:"C:\temp\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\566b9cb8d95dc0c0cfe359c9ffeaf252_2c04acab-f7da-4489-b9da-08efb0051201" /masterkey:f6d3e18299cc3502af58cbc01e1eea09e1d41972
-
+Third command: decrypt the private key, using the sha1 output as a masterkey parameter, output will be a pvk file with the private key:
+```
+mimikatz # dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e" /masterkey:f6d3e18299cc3502af58cbc01e1eea09e1d41972
+Private export : OK - 'raw_exchange_capi_0_db51e195-d879-4343-8a86-87120652ea65.pvk'
+```
  
