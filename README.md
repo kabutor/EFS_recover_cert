@@ -53,7 +53,7 @@ First, the one that will tell you what masterkey is used to encrypt that passwor
 dpapi::capi /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Crypto\RSA\S-1-5-21-809848743-1371230335-2595545360-1001\7b7b0fed9e49b647c6e908b622e34dc4_a63a392d-e48d-4ee0-a056-8d076995042e"
 guidMasterKey      : {bb1af8be-89cb-435f-80ed-1379bee29c53}
 ```
-Second, that guidMasterkey is the name of the file that is on the masterkeys dir (Microsoft\Protect\\<SID>), use it as a parameter on this command to decrypt the masterkey with the user password (the login password, not the pin), this also return a lot of data, important one is the sha1 at the end.
+Second, that guidMasterkey is the name of the file that is on the masterkeys dir (Microsoft\Protect\SID), use it as a parameter on this command to decrypt the masterkey with the user password (the login password, not the pin), this also return a lot of data, important one is the sha1 at the end.
 ```
 dpapi::masterkey /in:"C:\Users\kabutor\AppData\Roaming\Microsoft\Protect\S-1-5-21-809848743-1371230335-2595545360-1001\bb1af8be-89cb-435f-80ed-1379bee29c53" /password:USERPASSWORD
   sha1: f6d3e18299cc3502af58cbc01e1eea09e1d41972
